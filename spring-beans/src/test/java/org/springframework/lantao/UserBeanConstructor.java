@@ -1,10 +1,14 @@
 package org.springframework.lantao;
 
-public class UserBean {
+public class UserBeanConstructor {
     private String name;
 
     private int age;
 
+    public UserBeanConstructor(String name, int age){
+    	this.name = name;
+    	this.age = age;
+	}
 
 	@Override
 	public String toString() {

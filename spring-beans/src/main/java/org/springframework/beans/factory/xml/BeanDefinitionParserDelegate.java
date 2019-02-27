@@ -512,7 +512,7 @@ public class BeanDefinitionParserDelegate {
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 		String parent = null;
-		//解析parent属性GenericBeanDefinition
+		//解析parent属性
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
@@ -534,6 +534,7 @@ public class BeanDefinitionParserDelegate {
 			//解析replaced-method 书中55页有使用方法
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
+			//构造函数 参数
 			//解析constructor-arg 书中replaced-method后边
 			parseConstructorArgElements(ele, bd);
 			//解析Property 书中replaced-method后边

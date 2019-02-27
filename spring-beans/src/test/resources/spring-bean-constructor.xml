@@ -7,9 +7,9 @@
 
 
     <!-- 用于getBean -->
-    <bean id="userBean" class="org.springframework.lantao.UserBean">
-        <property name="name" value="liyuanyuan"/>
-		<property name="age" value="1111"/>
-     </bean>
+    <bean id="userBean" class="org.springframework.lantao.UserBeanConstructor">
+        <constructor-arg value="lantao"/>
+		<constructor-arg value="1000"/>
+    </bean>
 
 </beans>

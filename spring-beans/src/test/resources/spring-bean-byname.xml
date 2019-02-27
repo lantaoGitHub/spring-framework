@@ -6,10 +6,8 @@
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 
-    <!-- 用于getBean -->
-    <bean id="userBean" class="org.springframework.lantao.UserBean">
-        <property name="name" value="liyuanyuan"/>
-		<property name="age" value="1111"/>
-     </bean>
+	<bean id="userTwoBean" class="org.springframework.lantao.UserTwoBean"/>
 
+
+	<bean id="userOneBean" class="org.springframework.lantao.UserOneBean" autowire="byName"/>
 </beans>

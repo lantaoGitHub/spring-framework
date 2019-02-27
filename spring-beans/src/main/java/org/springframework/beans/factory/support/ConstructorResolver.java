@@ -124,32 +124,39 @@ class ConstructorResolver {
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
 
+		// explicitArgs是getBean（name,ags）的ags
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
 		else {
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
+				//获取解析构造函数或工厂方法
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
+				//构造函数或工厂方法不为空 & 存在构造方法（函数）
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
 					// Found a cached constructor...
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
+						// 配置构造函数参数
 						argsToResolve = mbd.preparedConstructorArguments;
 					}
 				}
 			}
 			if (argsToResolve != null) {
+				// 解析参数类型，比如构造方法是 A(int, int)，通过此方法将（"1"，"1"）转换为（1，1）
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve, true);
 			}
 		}
 
 		if (constructorToUse == null || argsToUse == null) {
-			// Take specified constructors, if any.
+			// 接受指定的构造函数(如果有的话)。.
 			Constructor<?>[] candidates = chosenCtors;
 			if (candidates == null) {
+				// 从class中获取
 				Class<?> beanClass = mbd.getBeanClass();
 				try {
+					// 从class获取构造器 判断是否是public
 					candidates = (mbd.isNonPublicAccessAllowed() ?
 							beanClass.getDeclaredConstructors() : beanClass.getConstructors());
 				}
@@ -159,13 +166,16 @@ class ConstructorResolver {
 							"] from ClassLoader [" + beanClass.getClassLoader() + "] failed", ex);
 				}
 			}
-
+			// 构造参数value == null 直接返回
 			if (candidates.length == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
 				Constructor<?> uniqueCandidate = candidates[0];
 				if (uniqueCandidate.getParameterCount() == 0) {
 					synchronized (mbd.constructorArgumentLock) {
+						// 构造器或工厂方法
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;
+						//构造函数参数解析
 						mbd.constructorArgumentsResolved = true;
+						// 构造函数参数
 						mbd.resolvedConstructorArguments = EMPTY_ARGS;
 					}
 					bw.setBeanInstance(instantiate(beanName, mbd, uniqueCandidate, EMPTY_ARGS));
@@ -173,7 +183,7 @@ class ConstructorResolver {
 				}
 			}
 
-			// Need to resolve the constructor.
+			// 需要解析构造函数参数
 			boolean autowiring = (chosenCtors != null ||
 					mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
 			ConstructorArgumentValues resolvedValues = null;
@@ -185,6 +195,7 @@ class ConstructorResolver {
 			else {
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
 				resolvedValues = new ConstructorArgumentValues();
+				// 解析构造函数参数
 				minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);
 			}
 
@@ -194,24 +205,30 @@ class ConstructorResolver {
 			LinkedList<UnsatisfiedDependencyException> causes = null;
 
 			for (Constructor<?> candidate : candidates) {
+				//获取构造方法参数类型
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 
 				if (constructorToUse != null && argsToUse != null && argsToUse.length > paramTypes.length) {
 					// Already found greedy constructor that can be satisfied ->
 					// do not look any further, there are only less greedy constructors left.
+					// 如果已经找到了可用的构造函数或者需要的参数个数小于当前当前函数的个数则终止
 					break;
 				}
 				if (paramTypes.length < minNrOfArgs) {
+					//参数个数不相等
 					continue;
 				}
 
 				ArgumentsHolder argsHolder;
 				if (resolvedValues != null) {
 					try {
+						// 从注解上获取参数名称
 						String[] paramNames = ConstructorPropertiesChecker.evaluate(candidate, paramTypes.length);
 						if (paramNames == null) {
+							// 参数名称探索期
 							ParameterNameDiscoverer pnd = this.beanFactory.getParameterNameDiscoverer();
 							if (pnd != null) {
+								//获取构造方法上的参数
 								paramNames = pnd.getParameterNames(candidate);
 							}
 						}
@@ -231,6 +248,7 @@ class ConstructorResolver {
 					}
 				}
 				else {
+					// 无参构造
 					// Explicit arguments given -> arguments length must match exactly.
 					if (paramTypes.length != explicitArgs.length) {
 						continue;
@@ -238,6 +256,7 @@ class ConstructorResolver {
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
 
+				// 判断是否有不确定的构造
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
 				// Choose this constructor if it represents the closest match.
@@ -277,11 +296,13 @@ class ConstructorResolver {
 			}
 
 			if (explicitArgs == null && argsHolderToUse != null) {
+				// 加入缓存
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
+		// 将构建的时间加入beanWrapper中 instantiate 方法
 		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
 		return bw;
 	}
@@ -655,6 +676,7 @@ class ConstructorResolver {
 			}
 			ConstructorArgumentValues.ValueHolder valueHolder = entry.getValue();
 			if (valueHolder.isConverted()) {
+				// 给参数赋值
 				resolvedValues.addIndexedArgumentValue(index, valueHolder);
 			}
 			else {
@@ -663,6 +685,7 @@ class ConstructorResolver {
 				ConstructorArgumentValues.ValueHolder resolvedValueHolder =
 						new ConstructorArgumentValues.ValueHolder(resolvedValue, valueHolder.getType(), valueHolder.getName());
 				resolvedValueHolder.setSource(valueHolder);
+				// 给参数赋值
 				resolvedValues.addIndexedArgumentValue(index, resolvedValueHolder);
 			}
 		}
@@ -696,21 +719,28 @@ class ConstructorResolver {
 		TypeConverter customConverter = this.beanFactory.getCustomTypeConverter();
 		TypeConverter converter = (customConverter != null ? customConverter : bw);
 
+		//初始化ArgumentsHolder，指定参数个数
 		ArgumentsHolder args = new ArgumentsHolder(paramTypes.length);
 		Set<ConstructorArgumentValues.ValueHolder> usedValueHolders = new HashSet<>(paramTypes.length);
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
-
+		// 根据参数个数进行 for
 		for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
+			// 根据paramIndex获取参数类型
 			Class<?> paramType = paramTypes[paramIndex];
+			// 根据paramIndex获取参数名称
 			String paramName = (paramNames != null ? paramNames[paramIndex] : "");
-			// Try to find matching constructor argument value, either indexed or generic.
+			// 尝试查找匹配的构造函数参数值.
+			// 参数对应得值
 			ConstructorArgumentValues.ValueHolder valueHolder = null;
+			//resolvedValues 是在xml解析doc时候赋值到beanDefinition中的
 			if (resolvedValues != null) {
+				// 获取参数值
 				valueHolder = resolvedValues.getArgumentValue(paramIndex, paramType, paramName, usedValueHolders);
 				// If we couldn't find a direct match and are not supposed to autowire,
 				// let's try the next generic, untyped argument value as fallback:
 				// it could match after type conversion (for example, String -> int).
 				if (valueHolder == null && (!autowiring || paramTypes.length == resolvedValues.getArgumentCount())) {
+					// 通过genericArgumentValues 获取value值  在 ConstructorResolver 693行进行的 genericArgumentValues add操作
 					valueHolder = resolvedValues.getGenericArgumentValue(null, null, usedValueHolders);
 				}
 			}
@@ -722,6 +752,7 @@ class ConstructorResolver {
 				Object convertedValue;
 				if (valueHolder.isConverted()) {
 					convertedValue = valueHolder.getConvertedValue();
+					// ArgumentsHolder赋值
 					args.preparedArguments[paramIndex] = convertedValue;
 				}
 				else {
@@ -740,9 +771,11 @@ class ConstructorResolver {
 					if (sourceHolder instanceof ConstructorArgumentValues.ValueHolder) {
 						Object sourceValue = ((ConstructorArgumentValues.ValueHolder) sourceHolder).getValue();
 						args.resolveNecessary = true;
+						// ArgumentsHolder赋值
 						args.preparedArguments[paramIndex] = sourceValue;
 					}
 				}
+				// ArgumentsHolder赋值
 				args.arguments[paramIndex] = convertedValue;
 				args.rawArguments[paramIndex] = originalValue;
 			}

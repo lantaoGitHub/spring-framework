@@ -175,14 +175,21 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		Object singletonObject = this.singletonObjects.get(beanName);
+		//检查缓存中是否存在实例  isSingletonCurrentlyInCreation 该实例是否在创建中
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			//如果缓存中实例为null 则锁定全局变量singletonObjects并进行处理
 			synchronized (this.singletonObjects) {
+				//尝试从earlySingletonObjects (创建中提早曝光的beanFactory) 获取bean
 				singletonObject = this.earlySingletonObjects.get(beanName);
 				if (singletonObject == null && allowEarlyReference) {
+					//尝试从singletonFactories获取beanFactory
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
+						//返回获取到的bean
 						singletonObject = singletonFactory.getObject();
+						//增加缓存
 						this.earlySingletonObjects.put(beanName, singletonObject);
+						//删除缓存
 						this.singletonFactories.remove(beanName);
 					}
 				}
@@ -201,7 +208,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
+		// 加锁，全局变量需要同步
 		synchronized (this.singletonObjects) {
+			//查看单例bean是否创建国如果有直接使用
 			Object singletonObject = this.singletonObjects.get(beanName);
 			if (singletonObject == null) {
 				if (this.singletonsCurrentlyInDestruction) {
@@ -212,6 +221,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				//记录加载状态 书中 99页
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -242,6 +252,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					//删除加载状态
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {

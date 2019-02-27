@@ -77,7 +77,7 @@ public class XmlBeanFactory extends DefaultListableBeanFactory {
 	 */
 	public XmlBeanFactory(Resource resource, BeanFactory parentBeanFactory) throws BeansException {
 		//ignoreDependencyInterface 忽略自动装配
-		//实现功能 A 中有 B 获取 A 的时候 B 还没有实例化，这时候B会自动实例化，但也有可能不会实例化，ignoreDependencyInterface这个方法操作
+		//主要功能就是当有忽略的接口类，自动装配会忽略这部分类的初始化装配，因为某种情况下，此时的接口实现类不能初始化，列如BeanNameAware,要想装配这个接口的实现对象，可以实现这个接口。
 		super(parentBeanFactory);
 		//这段代码是真正的资源加载
 		this.reader.loadBeanDefinitions(resource);
