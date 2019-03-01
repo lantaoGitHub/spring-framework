@@ -5,11 +5,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+	<bean id="userLookUp" class="lantao.UserLookUp"/>
 
-    <!-- 用于getBean -->
-    <bean id="userBean" class="org.springframework.lantao.UserBean">
-        <property name="name" value="liyuanyuan"/>
-		<property name="age" value="1111"/>
-     </bean>
+	<bean id="testLookUp" class="lantao.TestLookUp">
+		<lookup-method name="getBean" bean="userLookUp"/>
+	</bean>
 
 </beans>

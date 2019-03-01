@@ -10,7 +10,7 @@ public class XmlBeanFactoryTest {
         ClassPathResource classPathResource = new ClassPathResource("spring-bean.xml");
         BeanFactory beanFactory = new XmlBeanFactory(classPathResource);
         UserBean userBean = (UserBean) beanFactory.getBean("userBean");
-		  System.out.println(userBean.getName());
+          System.out.println(userBean.getName());
 
 
 		// 构造器注入

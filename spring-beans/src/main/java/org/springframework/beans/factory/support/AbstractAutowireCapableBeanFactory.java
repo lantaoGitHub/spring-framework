@@ -612,6 +612,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (earlySingletonExposure) {
+			// 缓存获取
 			Object earlySingletonReference = getSingleton(beanName, false);
 			//earlySingletonReference 再有在检查循环依赖的时候才不为空
 			if (earlySingletonReference != null) {
@@ -619,6 +620,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					exposedObject = earlySingletonReference;
 				}
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+					// 获取依赖
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
 					for (String dependentBean : dependentBeans) {
@@ -1167,7 +1169,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				//判断构造器或工厂方法是否为null
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
 					resolved = true;
-					//已经解析过class的构造器
+					//已经解析过class的构造器 构造器参数解析
 					autowireNecessary = mbd.constructorArgumentsResolved;
 				}
 			}
@@ -1213,6 +1215,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected BeanWrapper obtainFromSupplier(Supplier<?> instanceSupplier, String beanName) {
 		Object instance;
 
+		// 记录当前创建bean的名称
 		String outerBean = this.currentlyCreatedBean.get();
 		this.currentlyCreatedBean.set(beanName);
 		try {
@@ -1230,7 +1233,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (instance == null) {
 			instance = new NullBean();
 		}
+		// 根据对象构造 BeanWrapper 对象
 		BeanWrapper bw = new BeanWrapperImpl(instance);
+		// 初始化 BeanWrapper
 		initBeanWrapper(bw);
 		return bw;
 	}
