@@ -253,6 +253,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
 		Assert.notNull(locations, "Location array must not be null");
 		int count = 0;
+		// 循环加载，可支持同时处理多个xml
 		for (String location : locations) {
 			count += loadBeanDefinitions(location);
 		}

@@ -820,12 +820,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
+		// 循环所有bean并实例化 条件是：单例，非Abstract 非懒加载
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
+						// 如果类型是FactoryBean 处理
 						final FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
@@ -834,15 +836,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 									getAccessControlContext());
 						}
 						else {
+							// 判断是立即加载的 如果是 下边则加载
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
 						if (isEagerInit) {
+							// 提前实例化 放入缓存
 							getBean(beanName);
 						}
 					}
 				}
 				else {
+					// 提前实例化 放入缓存
 					getBean(beanName);
 				}
 			}

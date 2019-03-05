@@ -79,6 +79,8 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
 		AccessControlContext acc = null;
 
+		// 该方法也会在 BeanFactory 实例化bean 中调用  doCreateBean --> initializeBean --> applyBeanPostProcessorsBeforeInitialization --> postProcessBeforeInitialization
+		// 如果实例化的类实现了 invokeAwareInterfaces 方法中的判断类 则会调用初始方法赋值
 		if (System.getSecurityManager() != null &&
 				(bean instanceof EnvironmentAware || bean instanceof EmbeddedValueResolverAware ||
 						bean instanceof ResourceLoaderAware || bean instanceof ApplicationEventPublisherAware ||
