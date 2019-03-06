@@ -1,4 +1,4 @@
-package lantao;
+package lantao.lookUp;
 
 public abstract class TestLookUp {
 

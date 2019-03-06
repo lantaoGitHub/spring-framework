@@ -87,7 +87,7 @@ final class PostProcessorRegistrationDelegate {
 					regularPostProcessors.add(postProcessor);
 				}
 			}
-			//上边的For循环只是调用了硬编码的 BeanDefinitionRegistryPostProcessor 中的 postProcessBeanDefinitionRegistry 方法，
+			// 上边的For循环只是调用了硬编码的 BeanDefinitionRegistryPostProcessor 中的 postProcessBeanDefinitionRegistry 方法，
 			// 但是 BeanFactoryPostProcessor 中的 postProcessBeanFactory 方法还没有调用，是在方法的最后一行
 			// invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
 			// invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory); 这两个方法中执行的，

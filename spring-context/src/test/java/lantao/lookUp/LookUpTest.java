@@ -1,4 +1,4 @@
-package lantao;
+package lantao.lookUp;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

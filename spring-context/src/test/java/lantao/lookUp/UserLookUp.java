@@ -1,4 +1,4 @@
-package lantao;
+package lantao.lookUp;
 
 public class UserLookUp {
 	public void showMe(){
