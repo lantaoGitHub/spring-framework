@@ -204,6 +204,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
+		// 为{@link @Component}注册默认筛选器 , 将隐式注册所有具有 {@Link @Component}meta-注释的注释，包括 {@Link @Repository}、{@link @Service}和*{@link @Controller}原型注释。
+		// 这里就是 use-default-filters 属性值为 true 的操作，即使用默认的 Filter 进行包扫描，而默认的 Filter 对标有 @Service,@Controller,@Component和@Repository 的注解的类进行扫描
+		// includeFilters 的意思是 包含哪些 注解的 类
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
 		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
 		try {
@@ -416,8 +419,13 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
+			// ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX = "classpath*:";
+			// 通过观察resolveBasePackage()方法的实现, 我们可以在设置basePackage时, 使用形如${}的占位符, Spring会在这里进行替换
+			// this.resourcePattern 默认为 "**/*.class" resourcePattern 可以再xml中配置
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+			// 使用上面拼接出的形如 "classpath*:xx/yyy/zzz/**/*.class", 将其检索为Spring内置的Resource对象(这样就统一化了资源的差异)
+			// 使用ResourcePatternResolver的getResources方法获取 路径下全部  比如：classpath*:lantao/scan/**/*.class
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -425,13 +433,19 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				if (traceEnabled) {
 					logger.trace("Scanning " + resource);
 				}
+				// file是否可读
 				if (resource.isReadable()) {
 					try {
+						// 获取元数据  元数据就是用来定义数据的数据 就是定义 class 的 属性
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
+
+						// 根据锅炉器来判断是否符合要求 做  includeFilters excludeFilters 的判断
 						if (isCandidateComponent(metadataReader)) {
+							// 实例化 ScannedGenericBeanDefinition
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setResource(resource);
 							sbd.setSource(resource);
+							// 判断类必须是一个具体的实现类，并且它的实例化必须是独立的
 							if (isCandidateComponent(sbd)) {
 								if (debugEnabled) {
 									logger.debug("Identified candidate component class: " + resource);
@@ -488,13 +502,16 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @return whether the class qualifies as a candidate component
 	 */
 	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
+		// 判断 excludeFilters 的 TypeFilter
 		for (TypeFilter tf : this.excludeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
 				return false;
 			}
 		}
+		// 判断逻辑 includeFilters 中的 TypeFilter 默认包含的filter有 @components 和 引用他的  @service @controller @Repository
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
+				// 判断 @Conditional ， @Conditional是Spring4新提供的注解，它的作用是按照一定的条件进行判断，满足条件给容器注册bean。 还有 @ConditionalOnXX 等注解
 				return isConditionMatch(metadataReader);
 			}
 		}
@@ -525,6 +542,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
 		AnnotationMetadata metadata = beanDefinition.getMetadata();
+		// metadata.isIndependent() 是独立的 &
+		// metadata.isConcrete() 是否是接口或者是抽象类 或
+		// 必须是抽象类 和 有@lookup 注解
 		return (metadata.isIndependent() && (metadata.isConcrete() ||
 				(metadata.isAbstract() && metadata.hasAnnotatedMethods(Lookup.class.getName()))));
 	}

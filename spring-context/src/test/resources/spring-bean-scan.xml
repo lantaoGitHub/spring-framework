@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- use-default-filters 属性的默认值为 true，即使用默认的 Filter 进行包扫描，而默认的 Filter 对标有 @Service,@Controller和@Repository 的注解的类进行扫描 -->
+	<context:component-scan base-package="lantao.scan" use-default-filters="false">
+		<!-- 只扫描 base-package 的 controller 注解 还有对应的 exclude-filter 标签 排除 ； use-default-filters="false" 和 include-filter 一起使用 和 exclude-filter一起回抛异常-->
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+	</context:component-scan>
+
+</beans>

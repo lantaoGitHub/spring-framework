@@ -182,10 +182,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
 						//对默认标签处理
+						// 这里只处理 nade namespace 为 http://www.springframework.org/schema/beans 的标签
 						parseDefaultElement(ele, delegate);
 					}
 					else {
-						//对自定义标签处理
+						//对自定义标签处理 非namespace 为 http://www.springframework.org/schema/beans 的标签 ，会解析 <context:component-scan base-package="lantao.scan"/> 或者自定义 dubbo
 						delegate.parseCustomElement(ele);
 					}
 				}

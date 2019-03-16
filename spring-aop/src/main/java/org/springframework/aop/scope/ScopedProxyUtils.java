@@ -82,10 +82,12 @@ public abstract class ScopedProxyUtils {
 		targetDefinition.setPrimary(false);
 
 		// Register the target bean as separate bean in the factory.
+		// 注册被代理的bean的BeanDefinition对象
 		registry.registerBeanDefinition(targetBeanName, targetDefinition);
 
 		// Return the scoped proxy definition as primary bean definition
 		// (potentially an inner bean).
+		// 返回代理bean的BeanDefinitionHolder对象
 		return new BeanDefinitionHolder(proxyDefinition, originalBeanName, definition.getAliases());
 	}
 

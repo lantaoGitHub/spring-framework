@@ -290,7 +290,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			if (!typeCheckOnly) {
-				// 将指定的bean标记为已经创建(或即将创建)。
+				// 将指定的bean标记为已经创建(或即将创建)。记录
 				markBeanAsCreated(beanName);
 			}
 
@@ -300,7 +300,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.
-				// 保证当前bean所依赖的bean的初始化。
+				// 保证当前bean所依赖的bean的初始化。 这里是保证DependsOn 不是ref
+				// 首先要了解depends-on用来表示一个bean A的实例化依靠另一个bean B的实例化， 但是A并不需要持有一个B的对象，如果需要的话就不用depends-on
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
 					for (String dep : dependsOn) {

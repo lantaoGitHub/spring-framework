@@ -162,6 +162,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		this.registry = registry;
 
+		// 默认 useDefaultFilters 是 true 默认包含的filter有 @components 和 引用他的  @service @controller @Repository
 		if (useDefaultFilters) {
 			registerDefaultFilters();
 		}
@@ -271,23 +272,40 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+		// 循环扫描
 		for (String basePackage : basePackages) {
+			// 获取指定包下所有 BeanDefinition
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			for (BeanDefinition candidate : candidates) {
+				// 获取一个ScopeMetadata对象，默认为AnnotationScopeMetadataResolver
+				// 如果目标类未被@Scope注解，则返回一个默认的ScopeMetadata
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
+
+				// 使用bean名称生成器生成bean名称，默认生成器为AnnotationBeanNameGenerator
+				// 首先是以注解的value为bean名称，如果注解的value没有值，则使用默认的名称
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+
 				if (candidate instanceof AbstractBeanDefinition) {
+					// 设置AutowireCandidate autowire-candidate="false" 表示该对象不参与自动注入
+					// 借鉴与：https://blog.csdn.net/shangboerds/article/details/72758095
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
 				if (candidate instanceof AnnotatedBeanDefinition) {
+					// 处理定义在目标类上的注解，包括@Lazy, @Primary, @DependsOn, @Role, @Description
+					// 这里会检查和 设置 AnnotatedBeanDefinition 的 @Lazy(懒加载) @Primary(主要，https://www.cnblogs.com/liaojie970/p/7885106.html) @DependsOn(需要依赖但不需要持有) 注解
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+				// 检查beanName是否已经存在 BeanDefinitionRegistry 中存在。
 				if (checkCandidate(beanName, candidate)) {
+					//beanName 还没使用过
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
+					// 如果有必要，则创建作用域代理
+					// 如果创建了代理，则返回表示代理对象的BeanDefinitionHolder
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
+					// 注册Bean
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}
@@ -340,6 +358,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		if (originatingDef != null) {
 			existingDef = originatingDef;
 		}
+		// 判断是否兼容
 		if (isCompatible(beanDefinition, existingDef)) {
 			return false;
 		}

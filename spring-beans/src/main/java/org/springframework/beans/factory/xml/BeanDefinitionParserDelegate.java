@@ -1371,15 +1371,21 @@ public class BeanDefinitionParserDelegate {
 
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		// 获取node的 NameSpaceURI
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
+		// 解析自定义标签 需要在 Meta-inf 文件加 增加 spring.handlers 文件 例如：http\://www.springframework.org/schema/context=org.springframework.context.config.ContextNamespaceHandler
+		// 根据指定的 NameSpaceURI 获取 NamespaceHandler  handler可以参考spring.handlers文件
+		// abstract NamespaceHandlerSupport 实现了 NamespaceHandler 接口，继而实现了 NamespaceHandler 的两个个方法（parser，docreate），自定义handler 需要实现 NamespaceHandlerSupport 类
+		// 进行 NamespaceHandler 类的 init 方法的 实现， 主要是做注册 BeanDefinitionParser（ registerBeanDefinitionParser ） ， 需要自定义解析类 继承 BeanDefinitionParser 类
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		// 解析操作
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
