@@ -566,7 +566,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Allow post-processors to modify the merged bean definition.
-		// 允许后处理器修改合并的bean定义。
+		// 允许后处理器修改合并的 bean 定义。
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
@@ -582,7 +582,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
-		// 是否需要提前暴露， 单例&允许循环依赖&当前bean正在创建中  singletonsCurrentlyInCreation在DefaultSingletonBeanRegistry 225行创建，在创建bean之前记录 正在创建bean
+		// 是否需要提前暴露， 单例&允许循环依赖&当前bean正在创建中  singletonsCurrentlyInCreation 在 DefaultSingletonBeanRegistry 225行创建，在创建bean之前记录 正在创建bean
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
@@ -1410,7 +1410,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			pvs = newPvs;
 		}
 
-		// 是否具有实例化的Bean后处理处理器  用于autowird等
+		// 是否具有实例化的Bean后处理处理器  用于 autowird 等
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
 
@@ -1789,6 +1789,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			// 调用 bean 配置中的 init-method="xxx"
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {

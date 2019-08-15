@@ -187,6 +187,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 					}
 					else {
 						//对自定义标签处理 非namespace 为 http://www.springframework.org/schema/beans 的标签 ，会解析 <context:component-scan base-package="lantao.scan"/> 或者自定义 dubbo
+						// 或者 aop
 						delegate.parseCustomElement(ele);
 					}
 				}

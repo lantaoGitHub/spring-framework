@@ -1679,7 +1679,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 		if (object == null) {
 			// Return bean instance from factory.
-			// beanInstance一定是FactoryBean了
+			// beanInstance一定是 FactoryBean 了
 			FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
 			// Caches object obtained from FactoryBean if it is a singleton.
 			//在beanDefinitionMap 获取beanDefition ,beanDefinitionMap是注册时候的Map

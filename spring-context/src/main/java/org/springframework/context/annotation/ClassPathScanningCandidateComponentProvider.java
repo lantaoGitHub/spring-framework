@@ -439,7 +439,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 						// 获取元数据  元数据就是用来定义数据的数据 就是定义 class 的 属性
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
 
-						// 根据锅炉器来判断是否符合要求 做  includeFilters excludeFilters 的判断
+						// 根据过滤器来判断是否符合要求 做  includeFilters excludeFilters 的判断
 						if (isCandidateComponent(metadataReader)) {
 							// 实例化 ScannedGenericBeanDefinition
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);

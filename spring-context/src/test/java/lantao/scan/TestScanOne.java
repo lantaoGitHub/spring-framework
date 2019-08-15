@@ -10,9 +10,6 @@ public class TestScanOne {
 	@Autowired
 	private TestScanTwo testScanTwo;
 
-	@DependsOn
-	public TestScanTwo test1(){
-		return new TestScanTwo();
-	}
+
 
 }

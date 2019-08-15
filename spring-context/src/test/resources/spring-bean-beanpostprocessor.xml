@@ -11,6 +11,6 @@
 		<property name="age" value="1111"/>
 	</bean>
 
-	<bean id="beanPostProcessor" class="lantao.BeanFactoryPostProcessor.MyBeanFactoryPostProcessor"/>
+	<bean id="beanFactoryPostProcessor" class="lantao.BeanFactoryPostProcessor.MyBeanPostProcessor"/>
 
 </beans>

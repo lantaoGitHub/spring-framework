@@ -287,7 +287,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
 
 				if (candidate instanceof AbstractBeanDefinition) {
-					// 设置AutowireCandidate autowire-candidate="false" 表示该对象不参与自动注入
+					// 设置 AutowireCandidate autowire-candidate="false" 表示该对象不参与自动注入
 					// 借鉴与：https://blog.csdn.net/shangboerds/article/details/72758095
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
@@ -295,12 +295,12 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 					// 处理定义在目标类上的注解，包括@Lazy, @Primary, @DependsOn, @Role, @Description
 					// 这里会检查和 设置 AnnotatedBeanDefinition 的 @Lazy(懒加载) @Primary(主要，https://www.cnblogs.com/liaojie970/p/7885106.html) @DependsOn(需要依赖但不需要持有) 注解
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
-				}
-				// 检查beanName是否已经存在 BeanDefinitionRegistry 中存在。
+				 }
+				// 检查 beanName 是否已经存在 BeanDefinitionRegistry 中存在。
 				if (checkCandidate(beanName, candidate)) {
 					//beanName 还没使用过
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
-					// 如果有必要，则创建作用域代理
+					// 如果有必要，则创建代理作用域
 					// 如果创建了代理，则返回表示代理对象的BeanDefinitionHolder
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
